@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-tickets-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-tickets-app
+  template:
+    metadata:
+      labels:
+        app: support-tickets-app
+    spec:
+      containers:
+        - name: web
+          image: your-dockerhub-username/support-tickets-app:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_SUPABASE_URL
+              value: "https://<your-project>.supabase.co"
+            - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
+              value: "<your-anon-key>"
+            # Prefer using a Secret for the following in real setups
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              value: ""
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20
